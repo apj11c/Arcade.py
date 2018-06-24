@@ -1,0 +1,14 @@
+targetPractice.py
+	Modules used:
+		Circle.py, user created module
+		os
+		random
+		pygame
+	Other requirements:
+		target_background.png needed to display background of game
+	How to play:
+		Easy difficulty, a circle is sent across the screen
+		when the circle reaches the target, press the spacebar.
+		The user has 4 lives, when all 4 lives are expended the 
+		game is over. Lives are lost by pressing the spacebar when
+		the circle is not over the target
