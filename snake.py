@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 
 global screen, WHITE, running
 WHITE = (255, 255, 255)
@@ -19,6 +20,7 @@ def main():
 	food_x = 0
 	food_y = 0
 	snakeLength = 1
+	direction = 0
 	pygame.init()
 
 	#game main loop
@@ -29,12 +31,16 @@ def main():
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
 					x_speed = -0.3
+					direction = 3
 				elif event.key == pygame.K_RIGHT:
 					x_speed = 0.3
+					direction = 1
 				elif  event.key == pygame.K_UP:
 					y_speed = -0.3
+					direction = 0
 				elif event.key == pygame.K_DOWN:
 					y_speed = 0.3
+					direction = 2
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					x_speed = 0
@@ -70,7 +76,16 @@ def main():
 		#drawing preceeding body of snake
 		counter = 0
 		while counter != snakeLength:
-			pygame.draw.circle(screen, WHITE, (int(x_coord - (counter*10)), int(y_coord)), 10)
+			if counter != 0:
+				time.sleep(50.0/1000.0)
+			if direction == 0:
+				pygame.draw.circle(screen, WHITE, (int(x_coord), int(y_coord) + (counter*10)), 10)
+			elif direction == 2:
+				pygame.draw.circle(screen, WHITE, (int(x_coord), int(y_coord) - (counter*10)), 10)
+			elif direction == 1:
+				pygame.draw.circle(screen, WHITE, (int(x_coord + (counter*10)), int(y_coord)), 10)
+			else:
+				pygame.draw.circle(screen, WHITE, (int(x_coord - (counter*10)), int(y_coord)), 10)
 			counter += 1
 		
 		#collision detection with food and head of snake
