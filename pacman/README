@@ -1,0 +1,16 @@
+Node class:
+	Node.py contains all necessary datamembers for each possible decision point
+	PacMan or a ghost could turn at. I like to think it acts sort of like a railway
+	that keeps them from running through walls or doing undefined behavior.
+
+	-known bugs, if a user spams directions pacman could get lost and freeze the game
+
+Pacman.py
+	Contains the event loop that displays PacMan its self and blits the map
+
+Needed To Run:
+	Node.py
+	Pacman.py
+	PacmanBackground.png
+	Pacman.png
+	***all files are in the repo***
