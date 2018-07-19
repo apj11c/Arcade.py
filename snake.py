@@ -1,6 +1,5 @@
 import pygame
 import random
-import time
 
 global screen, WHITE, running
 WHITE = (255, 255, 255)
@@ -76,8 +75,6 @@ def main():
 		#drawing preceeding body of snake
 		counter = 0
 		while counter != snakeLength:
-			if counter != 0:
-				time.sleep(50.0/1000.0)
 			if direction == 0:
 				pygame.draw.circle(screen, WHITE, (int(x_coord), int(y_coord) + (counter*10)), 10)
 			elif direction == 2:
