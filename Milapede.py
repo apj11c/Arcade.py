@@ -94,7 +94,7 @@ def main():
 			snakeLength += 1
 		
 		#timer display
-		if seconds > 10:
+		if seconds > 60:
 			break;
 		text = font.render("Timer: "+str(60 - int(seconds)), 1, (255,255,255))
 		screen.blit(text, (20, 580))
