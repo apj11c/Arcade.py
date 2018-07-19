@@ -80,9 +80,9 @@ def main():
 			elif direction == 2:
 				pygame.draw.circle(screen, WHITE, (int(x_coord), int(y_coord) - (counter*10)), 10)
 			elif direction == 1:
-				pygame.draw.circle(screen, WHITE, (int(x_coord + (counter*10)), int(y_coord)), 10)
-			else:
 				pygame.draw.circle(screen, WHITE, (int(x_coord - (counter*10)), int(y_coord)), 10)
+			else:
+				pygame.draw.circle(screen, WHITE, (int(x_coord + (counter*10)), int(y_coord)), 10)
 			counter += 1
 		
 		#collision detection with food and head of snake
