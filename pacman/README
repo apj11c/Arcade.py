@@ -1,4 +1,4 @@
-Node class:
+Node.py:
 	Node.py contains all necessary data members for each possible decision point
 	PacMan or a ghost could turn at. I like to think it acts sort of like a railway
 	that keeps them from running through walls or doing undefined behavior.
@@ -9,7 +9,13 @@ Pacman.py
 Needed To Run:
 	Node.py
 	Pacman.py
+	
 	pacmanBackground.png
 	pacman.png
 	pacmanFood.png
+	Clyde.png
+	Blinky.png
+	Pinky.png
+	Inky.png
+	
 	***all files are in the repo***
