@@ -126,4 +126,3 @@ while not crashed:
 	x,y = myCircle.getAdjustedXY(x, y, slope, yIntercept)
 
 pygame.quit()
-quit()
