@@ -1,3 +1,7 @@
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QMessageBox
+
+import mainScreen
 import pygame
 import random
 
@@ -7,6 +11,7 @@ BLACK = (0, 0, 0)
 
 def main():
 	running = True
+	timeOut = False
 	(height, width) = (600, 800)
 	screen = pygame.display.set_mode((width, height))
 	pygame.display.set_caption('Milapede')
@@ -29,19 +34,21 @@ def main():
 		seconds=(pygame.time.get_ticks()-start_ticks)/1000
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				running = False
+				popUp = mainScreen.QuitMessage()
+				reply = popUp.exec_()
+				running = False if reply == QMessageBox.Yes else True
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					x_speed = -0.5
+					x_speed = -2
 					direction = 3
 				elif event.key == pygame.K_RIGHT:
-					x_speed = 0.5
+					x_speed = 2
 					direction = 1
 				elif  event.key == pygame.K_UP:
-					y_speed = -0.5
+					y_speed = -2
 					direction = 0
 				elif event.key == pygame.K_DOWN:
-					y_speed = 0.5
+					y_speed = 2
 					direction = 2
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -95,25 +102,30 @@ def main():
 		
 		#timer display
 		if seconds > 60:
+			timeOut = True
 			break;
 		text = font.render("Timer: "+str(60 - int(seconds)), 1, (255,255,255))
 		screen.blit(text, (20, 580))
 
 		#FPS update
 		pygame.display.update()
-		
-	
-	#display the game results
-	screen.fill(BLACK)
-	text=font.render("GAME OVER", 1, (255,255,255))
-	screen.blit(text, (340, 300))
-	text2=font.render("Score: " + str(snakeLength), 1, (255,255,255))
-	screen.blit(text2, (360, 330))
-	pygame.display.update()
-	pygame.time.delay(5000)
-	
+			
+#	#display the game results
+	if timeOut:
+		runningGameOverScreen = True
+		screen.fill(BLACK)
+		text=font.render("GAME OVER", 1, (255,255,255))
+		screen.blit(text, (340, 300))
+		text2=font.render("Score: " + str(snakeLength), 1, (255,255,255))
+		screen.blit(text2, (360, 330))
+		pygame.display.update()
+		while runningGameOverScreen:
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					runningGameOverScreen = False
 
+	pygame.display.quit()
+	pygame.quit()
+		
 if __name__ == "__main__":
 	main()
-
-

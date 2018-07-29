@@ -1,142 +1,299 @@
-''' roulette.py
-	
-	Roulette Table Setup
-	--------------------
+from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
-	[From en.wikipedia.org/wiki/Roulette#Roulette_wheel_number_sequence]
+import mainScreen
+import random
+import sys
+import time
 
-	The pockets of the roulette wheel are numbered from 0 to 36.
+class RouletteTable(QtWidgets.QMainWindow):
+	def __init__(self):
+		QtWidgets.QMainWindow.__init__(self)
+		self.setup()
 
-	In number ranges from 1 to 10 and 19 to 28, odd numbers are red
-	and even are black.
-	In ranges from 11 to 18 and 29 to 36, odd numbers are black
-	and even are red.
+	def setup(self):
+		self.setWindowTitle('Roulette')
+		self.setGeometry(200, 200, 700, 350)
+		self.setFixedSize(self.size())
+		self.setAutoFillBackground(True)
 
-	There is a green pocket numbered 0 (zero). In American roulette,
-	there is a second green pocket marked 00. Pocket number order on
-	the roulette wheel adheres to the following clockwise sequence in
-	most casinos:
-
-	0-28-9-26-30-11-7-20-32-17-5-22-34-15-3-24-36-13-1-
-	00-27-10-25-29-12-8-19-31-18-6-21-33-16-4-23-35-14-2
-
-	
-	Gameplay
-	--------
-	
-	- the user will begin with an amount of money (say, $10,000) and can
-	  place bets (on 1, 2, 3, 4, 5, or 6 numbers, with  payouts of 35 to 1,
-	  17 to 1, 11 to 1, 8 to 1, 6 to 1, and 5 to 1, respectively
-	- the user can play until they lose all of their money or until
-	  they decide to quit
-	- at the end of the game, whether they lost or won will be displayed
-	  before the window closes
-		- user clicks "quit game" button -> if they won money display that
-		  they won / if they lost money display that they lost / if they
-		  broke even display that they broke even
-		- obviously, if the user loses all of their money before quitting,
-		  they lost
-
-	
-	Remaining Implementation
-	------------------------
-	
-	- Will use PyQt5 to display roulette wheel
-	- Will keep track of winnings on the side, update value as the game goes on
-	- Will display numbers bet on and result of spin as well	
-
-'''
-
-# import PyQt5 packages
-import random 
-
-# ------ gameplay, without graphics ------
-
-wheel = {0 : "0", 1 : "28", 2 : "9", 3 : "26", 4 : "30", 5 : "11",
-		 6 : "7", 7 : "20", 8 : "32", 9 : "17", 10 : "5", 11 : "22",
-		 12 : "34", 13 : "15", 14 : "3", 15 : "24", 16 : "36", 17 : "13",
-		 18 : "1", 19 : "00", 20 : "27", 21 : "10", 22 : "25", 23 : "29",
-		 24 : "12", 25 : "8", 26 : "19", 27 : "31", 28 : "18", 29 : "6",
-		 30 : "21", 31 : "33", 32 : "16", 33 : "4", 34 : "23", 35 : "35",
-		 36 : "14", 37 : "2"}
-
-
-# Player starts with $10,000
-money = 10000
-
-# Respective returns on betting on 1, 2, 3, 4, 5, or 6 numbers
-odds = [35, 17, 11, 8, 6, 5]
-
-print("Current Balance: $" + str(money))
-
-choice = int(input("How many numbers do you want to bet on (1-6, 0 to quit)? "))
-
-# Accounting for invalid input
-while choice < 0 or choice > 6:
-	choice = int(input("Please enter a number 1-6 (0 to quit): "))
-
-
-# If 0 is chosen, quit game
-while choice != 0:
-	betAmt = int(input("How much do you want to bet? "))
-
-	# Accounting for invalid input
-	while betAmt > money or betAmt < 0:
-		print("Invalid bet amount (valid amounts are 1-" + str(money) + ").")
-		betAmt = int(input("How much do you want to bet? "))
-
-
-	nums = []
-	
-	# Placing bets
-	print("Enter the numbers:")
-	for i in range(0, choice):
-		bet = input("Number " + str(i + 1) + ": ")
+		self.image = DisplayImage(self)
+		self.setCentralWidget(self.image)
 		
-		# Accounting for invalid input
-		if ((int(bet) < 0 or int(bet) > 36) and bet != "00") or bet in nums:
-			while ((int(bet) < 0 or int(bet) > 36)
-					and bet != "00") or bet in nums:
-				if bet in nums:
-					print(bet + " already used.")
-				print("Please enter a valid roulette wheel number (0-36 and 00).")
-				bet = input("Number " + str(i + 1) + ": ")
-
+		self.cb = QtWidgets.QLabel(self)
+		self.cb.setText("Current Balance:")
+		self.cb.move(5, 0)
 	
-		nums.append(bet)
+		self.money = 10000
+		self.gameNotOver = True
 
-	# Spin wheel
-	result = random.randint(0, 37)
+		self.balance = QtWidgets.QLineEdit(self)
+		self.balance.setFixedWidth(95)
+		self.balance.setText("$" + str(self.money))
+		self.balance.move(115, 2)
+		self.balance.setReadOnly(True)
+
+		self.prompt = QtWidgets.QLabel(self)
+		self.prompt.setText("Bet on how many numbers? (0 to end game)")
+		self.prompt.setFixedWidth(275)
+		self.prompt.move(430, 0)
+
+		self.enterBetsCount = 0
+		self.combo = QtWidgets.QComboBox(self)
+		self.combo.addItem('0')
+		self.combo.addItem('1')
+		self.combo.addItem('2')
+		self.combo.addItem('3')
+		self.combo.addItem('4')
+		self.combo.addItem('5')
+		self.combo.addItem('6')
+		self.combo.move(600, 30)
+		self.combo.currentTextChanged.connect(self.enterBets)
+		self.numBets = 0 #int(str(self.combo.currentText()))
+
+		self.text1 = QtWidgets.QLineEdit(self)
+		self.text2 = QtWidgets.QLineEdit(self)
+		self.text3 = QtWidgets.QLineEdit(self)
+		self.text4 = QtWidgets.QLineEdit(self)
+		self.text5 = QtWidgets.QLineEdit(self)
+		self.text6 = QtWidgets.QLineEdit(self)
+		
+		self.texts = [self.text1, self.text2, self.text3,
+					  self.text4, self.text5, self.text6]
+
+		offset = 0
+		for i in self.texts:
+			i.setFixedWidth(120)
+			i.move(575, 60 + offset)
+			i.hide()
+			offset += 40
+			
+		self.placeBetsCount = 0
+		self.placeBetBtn = QtWidgets.QPushButton('Place Bets', self)
+		self.placeBetBtn.clicked.connect(self.placeBets)
+		self.placeBetBtn.move(600, 290)
+
+		self.howMuch = QtWidgets.QLabel(self)
+		self.howMuch.setText("How much do you want to bet?")
+		self.howMuch.setFixedWidth(240)
+		self.howMuch.move(5, 30)
+
+		self.betAmt = QtWidgets.QLineEdit(self)
+		self.betAmt.setFixedWidth(120)
+		self.betAmt.move(5, 60)
 	
-	print("Result: " + wheel[result])
+		self.betAmtError = QtWidgets.QLabel(self)
+		self.betAmtError.setText("Valid range is 1-Current Balance")
+		self.betAmtError.setStyleSheet('color: red')
+		self.betAmtError.setFixedWidth(200)
+		self.betAmtError.move(5, 90)
+		self.betAmtError.hide()
 
-	# Adjust player's money accordingly
-	if wheel[result] in nums:
-		print("You won!")
-		money += (odds[choice - 1] * betAmt)
-	else:
-		print("You lost!")
-		money -= betAmt
+		self.wheelRangeError = QtWidgets.QLabel(self)
+		self.wheelRangeError.setText("Valid range is 0-36 and 00")
+		self.wheelRangeError.setStyleSheet("color: red")
+		self.wheelRangeError.setFixedWidth(170)
+		self.wheelRangeError.move(530, 310)
+		self.wheelRangeError.hide()
 
-	# Game is over if player runs out of money
-	if money == 0:
-		print("You ran out of money to bet! Game Over.")
-		break
+		self.alreadyUsedError = QtWidgets.QLabel(self)
+		self.alreadyUsedError.setText("Only use each number once")
+		self.alreadyUsedError.setStyleSheet("color: red")
+		self.alreadyUsedError.setFixedWidth(170)
+		self.alreadyUsedError.move(530, 310)
+		self.alreadyUsedError.hide()
 
+		self.resultLabel = QtWidgets.QLabel(self)
+		self.resultLabel.hide()
+		self.winLoss = QtWidgets.QLabel(self)
+		self.winLoss.hide()
+		self.gameOverLabel = QtWidgets.QLabel(self)
+		self.gameOverLabel.hide()
+		self.gameOverMessage = QtWidgets.QLabel(self)
+		self.gameOverMessage.hide()
 
-	print("Current Balance: $" + str(money))
+		exitAction = QtWidgets.QAction('Exit', self)
+		exitAction.triggered.connect(QtWidgets.qApp.quit)
 
-	choice = int(input("How many numbers do you want to bet on (1-6, 0 to quit)? "))
+		self.show()
 
-	while choice < 0 or choice > 6:
-		choice = int(input("Please enter a number 1-6 (0 to quit): "))
+	def enterBets(self):
+		self.enterBetsCount += 1
+		remove = 0
 
+		if self.enterBetsCount > 1:
+			remove = self.numBets - int(str(self.combo.currentText()))
 
-# Print whether user won or lost money overall
-if money > 10000:
-	print("You made money! You won!!!")
-elif money == 10000:
-	print("You didn't lose money! That's a win in my book.")
-else:
-	print("You lost money! You lose!!!")
+		self.numBets = int(str(self.combo.currentText()))
 
+		if remove > 0:
+			for i in range(remove):
+				self.texts[remove + self.numBets - 1 - i].hide()
+
+		for i in range(self.numBets):			
+			self.texts[i].show()
+		
+		if self.numBets == 0:
+			self.betAmt.setReadOnly(True)
+		else:
+			self.betAmt.setReadOnly(False)	
+
+		self.placeBetBtn.setEnabled(True)
+		
+	def placeBets(self):
+		self.placeBetsCount += 1
+		self.combo.setEnabled(False)
+		
+		wheelError = False
+		doublingError = False
+
+		for i in range(self.numBets):
+			if self.isInRange(self.texts[i].text()) == False:
+				wheelError = True
+		
+		wheelNums = []
+		for i in range(self.numBets):
+			if self.texts[i].text() not in wheelNums:
+				wheelNums.append(self.texts[i].text())
+			elif not wheelError:
+				self.alreadyUsedError.show()
+				doublingError = True
+
+		if wheelError and not doublingError:
+			self.alreadyUsedError.hide()
+			self.wheelRangeError.show()
+		elif not wheelError:
+			self.wheelRangeError.hide()
+			if not doublingError:
+				for i in range(self.numBets):
+					self.texts[i].setReadOnly(True)
+				self.alreadyUsedError.hide()
+
+		if self.numBets == 0:
+			self.gameNotOver = False
+			self.gameOver()
+
+		if self.gameNotOver:
+			if int(self.betAmt.text()) < 1 or \
+			   int(self.betAmt.text()) > self.money:
+				self.betAmtError.show()
+			else:
+				self.betAmtError.hide()
+				self.betAmt.setReadOnly(True)
+
+				if not wheelError and not doublingError:
+					self.play()
+
+	def isInRange(self, bet):
+		if (int(bet) >= 0 and int(bet) <= 36) or bet == "00":
+			return True
+		
+		return False
+
+	def play(self):
+		wheel = {0 : "0", 1 : "28", 2 : "9", 3 : "26", 4 : "30", 5 : "11",
+		 			  6 : "7", 7 : "20", 8 : "32", 9 : "17", 10 : "5",
+					  11 : "22", 12 : "34", 13 : "15", 14 : "3", 15 : "24",
+					  16 : "36", 17 : "13", 18 : "1", 19 : "00", 20 : "27",
+					  21 : "10", 22 : "25", 23 : "29", 24 : "12", 25 : "8",
+					  26 : "19", 27 : "31", 28 : "18", 29 : "6", 30 : "21",
+					  31 : "33", 32 : "16", 33 : "4", 34 : "23", 35 : "35",
+					  36 : "14", 37 : "2"}
+		
+		odds = [35, 17, 11, 8, 6, 5]
+
+		if self.gameNotOver:
+			result = random.randint(0, 37)
+			self.resultLabel.setText("Result: " + wheel[result])
+			self.resultLabel.move(5, 120)
+			self.resultLabel.show()
+			self.placeBetBtn.setEnabled(False)
+
+			betNums = [i.text() for i in self.texts]
+			if wheel[result] in betNums:
+				self.winLoss.setText("You won!")
+				self.winLoss.setStyleSheet('color: green')
+				self.money += (odds[self.numBets - 1] * int(self.betAmt.text()))
+			else:
+				self.winLoss.setText("You lost!")
+				self.winLoss.setStyleSheet('color: red')
+				self.money -= int(self.betAmt.text())
+			
+			self.winLoss.move(5, 150)
+			self.winLoss.show()			
+			self.balance.setText("$" + str(self.money))
+
+			self.combo.setEnabled(True)
+			self.betAmt.setReadOnly(False)
+			for i in self.texts:
+				i.setText("")
+				i.setReadOnly(False)
+				i.hide()
+		
+			if self.money == 0:
+				self.gameNotOver = False
+				self.gameOver()
+
+	def gameOver(self):
+		self.placeBetBtn.setEnabled(False)
+		self.betAmt.setReadOnly(True)
+		self.combo.setEnabled(False)
+
+		if int(self.money) > 10000:
+			self.gameOverMessage.setText("You made money! You win!!!")
+			self.gameOverMessage.setStyleSheet('color: green')
+		elif int(self.money) < 10000:
+			self.gameOverMessage.setText("You lost money! You lose!")
+			self.gameOverMessage.setStyleSheet('color: red')
+		else:
+			self.gameOverMessage.setText(
+			"You broke even! That's a win in my book.")
+		
+		self.gameOverMessage.setFixedWidth(300)
+		self.gameOverMessage.move(5, 320)
+		self.gameOverMessage.show()
+	
+		self.gameOverLabel.setText("GAME OVER")
+		self.gameOverLabel.setFixedWidth(80)
+		self.gameOverLabel.move(315, 320)
+		self.gameOverLabel.show()
+
+	def closeEvent(self, event):
+		if self.gameNotOver:
+			popUp = mainScreen.QuitMessage()
+			reply = popUp.exec_()
+			if reply == QtWidgets.QMessageBox.Yes:
+				event.accept()
+			else:
+				event.ignore()
+		else:
+			event.accept()
+
+class DisplayImage(QtWidgets.QWidget):
+	def __init__(self, parent):
+		QtWidgets.QWidget.__init__(self, parent)
+		self.setup()
+
+	def setup(self):
+		self.image = QtWidgets.QLabel(self)
+		pixmap =  QtGui.QPixmap("Images/rouletteWheel.jpg")
+		self.image.resize(280, 280)
+		self.image.setPixmap(pixmap.scaled(self.image.size(),
+							 QtCore.Qt.IgnoreAspectRatio))
+		self.image.move(210, 35)		
+
+"""
+class QuitMessage(QtWidgets.QMessageBox):
+	def __init__(self):
+		QtWidgets.QMessageBox.__init__(self)
+		self.setText("Quit game?")
+		self.addButton(self.No)
+		self.addButton(self.Yes)
+"""
+
+if __name__ == "__main__":
+	app = QtWidgets.QApplication(sys.argv)
+	main_window = RouletteTable()
+	app.exec_()
