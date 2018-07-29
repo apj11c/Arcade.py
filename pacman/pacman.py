@@ -471,4 +471,3 @@ while not crashed:
 	pygame.display.update()
 
 pygame.quit()
-quit()
