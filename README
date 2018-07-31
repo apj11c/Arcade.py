@@ -66,12 +66,34 @@ Needed To Run:
 
 Milapede
 ========
-
+Milapede.py:
+	Countains all data necessary for running game. Everything is defined in main.
+	First time working with pygame, mainly used for testing the functionality of 
+	movement and how pygame works.
+How to play:
+	Use the directional pad to move the "Milapede" around to eat food. The Malapede
+	grows when it consumes a food object. Eat as much food in the given time limit to
+	determine the score.
+Needed To Run:
+	Milapede.py
 
 
 Space Adventure
 ===============
-
+SpaceAdventure.py:
+	Contains all code to run the program. Everythin is defined in main. Need 
+	pictures to load background and objects properly.
+How to play:
+	Move space ship left and rigth (no wrapping) with the directional pad. 
+	Astroids spawn randomly in front of the space ship. Space ship shoots a 
+	single bullet at a time, passing through every astroid it hits, gaining 
+	10 pts per astroid hit. Use the space bar to fire the bullet. Hit as many
+	astroids as you can before the timer is up to generate the score.
+Needed to run:
+	background.png
+	astroid.png
+	spaceship.png
+	SpaceAdventure.py
 
 
 Roulette
